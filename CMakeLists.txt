@@ -10,10 +10,13 @@ if (POLICY CMP0141)
 endif()
 
 project ("OpenGL_Practice")
+set (CMAKE_CXX_STANDARD 17)
 
 # Include sub-projects.
 add_subdirectory ("OpenGL_Practice")
 add_subdirectory (GLFW)
+add_subdirectory (GLEW)
+add_subdirectory (GLM)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/GLFW/include)
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/GLEW/include)

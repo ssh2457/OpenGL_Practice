@@ -30,10 +30,10 @@ GLfloat lastTime = 0.f;
 
 
 // Vertex Shadder
-static const char* vShader = "Shaders/shader.vert";
+static const char* vShader = "../../Shaders/shader.vert";
 
 // Fragment Shadder
-static const char* fShader = "Shaders/shader.frag";
+static const char* fShader = "../../Shaders/shader.frag";
 
 
 void CreateObjects() {
@@ -76,9 +76,9 @@ int main(void) {
 
 	Camera* camera = new Camera(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), -90.0f, 0.0f, 5.f, 0.5f);
 
-	Texture* brickTexture = new Texture("Textures/brick.png");
+	Texture* brickTexture = new Texture("../../Textures/brick.png");
 	brickTexture->LoadTexture();
-	Texture* dirtTexture = new Texture("Textures/dirt.png");
+	Texture* dirtTexture = new Texture("../../Textures/dirt.png");
 	dirtTexture->LoadTexture();
 
 
