@@ -13,3 +13,8 @@ project ("OpenGL_Practice")
 
 # Include sub-projects.
 add_subdirectory ("OpenGL_Practice")
+add_subdirectory (GLFW)
+
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/GLFW/include)
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/GLEW/include)
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/GLM/)
