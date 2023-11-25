@@ -7,3 +7,6 @@
 [submodule "GLM"]
 	path = GLM
 	url = https://github.com/g-truc/glm.git
+[submodule "SPDLOG"]
+	path = SPDLOG
+	url = https://github.com/gabime/spdlog.git
