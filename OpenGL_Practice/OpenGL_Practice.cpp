@@ -5,11 +5,14 @@
 #include "Window.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "Light.h"
 
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <vector>
+
+#include <spdlog/spdlog.h>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -45,11 +48,11 @@ void CreateObjects() {
 	};
 
 	GLfloat vertices[] = {
-		// x,  y,  z,  u,  v
-		-1.f, -1.f, 0.f, 0.f, 0.f,
-		0.f, -1.f, 1.f, 0.5f, 0.f,
-		1.0f, -1.0f, 0.f, 1.f, 0.f,
-		0.f, 1.0f, 0.f, 0.5f, 1.f,
+		// x,   y,     z,     u,     v
+		-1.f,  -1.f,   0.f,   0.f,   0.f,
+		 0.f,  -1.f,   1.f,   0.5f,  0.f,
+		 1.0f, -1.0f,  0.f,   1.f,   0.f,
+		 0.f,   1.0f,  0.f,   0.5f,  1.f,
 	};
 
 	Mesh* obj1 = new Mesh();
@@ -67,7 +70,8 @@ void CreateShaders() {
 	shaderList.push_back(shader1);
 }
 
-int main(void) {
+int main(int argc, const char** argv) {
+	SPDLOG_INFO("OPENGL program start");
 	Window* mainWindow = new Window(800, 600);
 	mainWindow->Initialise();
 
@@ -81,8 +85,10 @@ int main(void) {
 	Texture* dirtTexture = new Texture("../../Textures/dirt.png");
 	dirtTexture->LoadTexture();
 
+	Light* mainLight = new Light(1.f, 1.f, 1.f, 0.2f);
 
-	GLuint uniformModel = 0, uniformProjection = 0, uniformView = 0;
+
+	GLuint uniformModel = 0, uniformProjection = 0, uniformView = 0, uniformAmbientIntensity = 0, uniformAmbientColour = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, static_cast<GLfloat>(mainWindow->GetBufferWidth()) / static_cast<GLfloat>(mainWindow->GetBufferHeight()), 0.1f, 100.f);
 
@@ -108,6 +114,10 @@ int main(void) {
 		uniformModel = shaderList[0]->GetModelLocation();
 		uniformProjection = shaderList[0]->GetProjectionLocation();
 		uniformView = shaderList[0]->GetViewLocation();
+		uniformAmbientIntensity = shaderList[0]->GetAmbientIntensityLocation();
+		uniformAmbientColour = shaderList[0]->GetAmbientColourLocation();
+
+		mainLight->UseLight(uniformAmbientIntensity, uniformAmbientColour);
 
 		glm::mat4 model(1.f);
 
@@ -160,6 +170,6 @@ int main(void) {
 	delete camera; camera = nullptr;
 	delete brickTexture; brickTexture = nullptr;
 	delete dirtTexture; dirtTexture = nullptr;
-
+	delete mainLight; mainLight = nullptr;
 	return 0;
 }
