@@ -2,4 +2,5 @@
 GLEW
 GLFW
 GLM
+SPDLOG
 out
