@@ -73,6 +73,8 @@ int Window::Initialise() {
 
 	// Handle key + Mouse input
 	CreateCallbacks();
+
+	// Hide mouse cursor in window
 	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
