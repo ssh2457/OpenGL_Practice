@@ -1,11 +1,33 @@
 #pragma once
 
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "Common.h"
+
 #include <cstdio>
 #include <string>
 #include <iostream>
 #include <fstream>
 
 #include <GL/glew.h>
+
+struct UniformDirectionalLight {
+	GLuint uniformColour;
+	GLuint uniformAmbientIntensity;
+	GLuint uniformDiffuseIntensity;
+	GLuint uniformDirection;
+};
+
+struct UniformPointLight {
+	GLuint uniformColour;
+	GLuint uniformAmbientIntensity;
+	GLuint uniformDiffuseIntensity;
+	GLuint uniformPosition;
+	GLuint uniformConstant;
+	GLuint uniformLinear;
+	GLuint uniformExponent;
+};
+
 
 class Shader {
 public:
@@ -21,7 +43,7 @@ public:
 	GLuint GetModelLocation() const;
 	GLuint GetViewLocation() const;
 	GLuint GetAmbientIntensityLocation() const;
-	GLuint GetAmbientColourLocation() const;
+	GLuint GetColourLocation() const;
 	GLuint GetDiffuseIntensityLocation() const;
 	GLuint GetDirectionLocation() const;
 	GLuint GetSpecularIntensityLocation() const;
@@ -30,10 +52,17 @@ public:
 
 	void UseShader();
 	void ClearShader();
+
+	void SetDirectionalLight(DirectionalLight* dLight);
+	void SetPointLights(PointLight* pLight, unsigned int lightCount);
 private:
 	GLuint shaderID, uniformProjection, uniformModel, uniformView, uniformEyePosition,
-		uniformAmbientIntensity, uniformAmbientColour, uniformDiffuseIntensity, uniformDirection,
-		uniformSpecularIntensity, uniformShininess;
+		uniformSpecularIntensity, uniformShininess,
+		uniformPointLightCount;
+
+	UniformDirectionalLight uniformDirectionalLight;
+	UniformPointLight uniformPointLights[MAX_POINT_LIGHT];
+	int PointLightCount;
 
 	void CompileShader(const char* vertexCode, const char* fragmentCode);
 	void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
