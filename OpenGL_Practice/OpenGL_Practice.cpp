@@ -12,6 +12,8 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
 
+#include <assimp/Importer.hpp>
+
 #include "Common.h"
 
 #include "Window.h"
@@ -23,6 +25,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
+#include "Model.h"
 
 const float toRadians = 3.14159265f / 180.0f;
 
@@ -128,17 +131,20 @@ int main()
 	Camera camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);
 
 	Texture brickTexture = Texture("../../Textures/brick.png");
-	brickTexture.LoadTexture();
+	brickTexture.LoadTextureA();
 	Texture dirtTexture = Texture("../../Textures/dirt.png");
-	dirtTexture.LoadTexture();
+	dirtTexture.LoadTextureA();
 	Texture plainTexture = Texture("../../Textures/plain.png");
-	plainTexture.LoadTexture();
+	plainTexture.LoadTextureA();
 
 	Material shinyMaterial = Material(4.0f, 256);
 	Material dullMaterial = Material(0.3f, 4);
 
+	Model xWing = Model();
+	xWing.LoadModel("../../Models/x-wing.obj");
+
 	DirectionalLight mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.1f, 0.1f,
+		0.2f, 0.6f,
 		0.0f, 0.0f, -1.0f);
 
 	unsigned int pointLightCount = 0;
@@ -236,6 +242,13 @@ int main()
 		dirtTexture.UseTexture();
 		shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		meshList[2]->RenderMesh();
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-7.0f, 0.0f, 10.0f));
+		model = glm::scale(model, glm::vec3(0.006f, 0.006f, 0.006f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		xWing.RenderModel();
 
 		glUseProgram(0);
 
