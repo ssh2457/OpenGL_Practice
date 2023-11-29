@@ -74,3 +74,7 @@ glm::mat4 Camera::CalculateViewMatrix() {
 glm::vec3 Camera::GetCameraPosition() const {
 	return position;
 }
+
+glm::vec3 Camera::GetCameraDirection() const {
+	return front;
+}

@@ -7,16 +7,16 @@ public:
 	PointLight();
 	PointLight(GLfloat red, GLfloat green, GLfloat blue,
 		GLfloat ambientIntensity, GLfloat diffuseIntensity,
-		GLfloat x, GLfloat y, GLfloat z,
+		GLfloat posX, GLfloat posY, GLfloat posZ,
 		GLfloat con, GLfloat lin, GLfloat exp);
 
 	virtual ~PointLight();
 
-	void UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLocation,
+	void UseLight(GLuint ambientIntensityLocation, GLuint colourLocation,
 		GLuint diffuseIntensityLocation, GLuint positionLocation,
-		GLfloat constantLocation, GLfloat linearLocation, GLfloat exponentLocation);
+		GLuint constantLocation, GLuint linearLocation, GLuint exponentLocation);
 
-private:
+protected:
 	glm::vec3 Position;
 	GLfloat Constant, Linear, Exponent;
 
