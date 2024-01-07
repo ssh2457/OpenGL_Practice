@@ -7,10 +7,15 @@ DirectionalLight::DirectionalLight()
 }
 
 
-DirectionalLight::DirectionalLight(GLfloat red, GLfloat green, GLfloat blue, GLfloat ambientIntensity, GLfloat diffuseIntensity, GLfloat x, GLfloat y, GLfloat z)
-	: Light(red, green, blue, ambientIntensity, diffuseIntensity)
+DirectionalLight::DirectionalLight(GLfloat shadowWidth, GLfloat shadowHeightm, 
+								GLfloat red, GLfloat green, GLfloat blue, 
+								GLfloat ambientIntensity, GLfloat diffuseIntensity, 
+								GLfloat x, GLfloat y, GLfloat z)
+	: Light(shadowWidth, shadowHeightm, 
+			red, green, blue, 
+			ambientIntensity, diffuseIntensity)
 	, Direction(glm::vec3(x, y, z)) {
-
+	lightProj = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f);
 }
 
 DirectionalLight::~DirectionalLight() {
@@ -23,4 +28,9 @@ void DirectionalLight::UseLight(GLuint ambientIntensityLocation, GLuint ColourLo
 
 	glUniform3f(directionLocation, Direction.x, Direction.y, Direction.z);
 	glUniform1f(diffuseIntensityLocation, DiffuseIntensity);
+}
+
+glm::mat4 DirectionalLight::CalcLightTransform()
+{
+	return lightProj * glm::lookAt(-Direction, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }

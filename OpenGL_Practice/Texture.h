@@ -5,7 +5,7 @@
 
 class Texture {
 public:
-	Texture() = delete;
+	Texture();
 	Texture(const char* fileLoc);
 	virtual ~Texture();
 
