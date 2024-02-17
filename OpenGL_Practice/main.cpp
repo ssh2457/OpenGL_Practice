@@ -263,14 +263,14 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
 	shaderList[0].SetDirectionalLight(&mainLight);
-	shaderList[0].SetPointLights(pointLights, pointLightCount);
-	shaderList[0].SetSpotLights(spotLights, spotLightCount);
+	shaderList[0].SetPointLights(pointLights, pointLightCount, 3, 0);
+	shaderList[0].SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 	auto lTransform = mainLight.CalculateLightTransform();
 	shaderList[0].SetDirectionalLightTransform(&lTransform);
 
-	mainLight.getShadowMap()->Read(GL_TEXTURE1);
-	shaderList[0].SetTexture(0);
-	shaderList[0].SetDirectionalShadowMap(1);
+	mainLight.getShadowMap()->Read(GL_TEXTURE2);
+	shaderList[0].SetTexture(1);
+	shaderList[0].SetDirectionalShadowMap(2);
 
 	glm::vec3 lowerLight = camera.getCameraPosition();
 	lowerLight.y -= 0.3f;
@@ -306,37 +306,37 @@ int main()
 	blackhawk.LoadModel("../../Models/uh60.obj");
 
 	mainLight = DirectionalLight(2048, 2048,
-								1.0f, 1.0f, 1.0f, 
-								0.1f, 0.3f,
-								0.0f, -15.0f, -10.0f);
-
-	pointLights[0] = PointLight(1024, 1024,
-		0.01f, 100.f,
-		0.0f, 0.0f, 1.0f,
-								0.0f, 0.1f,
-								0.0f, 0.0f, 0.0f,
-								0.3f, 0.2f, 0.1f);
-	pointLightCount++;
-	pointLights[1] = PointLight(1024, 1024,
-		0.01f, 100.f, 
-		0.0f, 1.0f, 0.0f,
-								0.0f, 0.1f,
-								-4.0f, 2.0f, 0.0f,
-								0.3f, 0.1f, 0.1f);
-	pointLightCount++;
-
-	
-	spotLights[0] = SpotLight(1024, 1024,
-		0.01f, 100.f, 
 		1.0f, 1.0f, 1.0f,
-						0.0f, 2.0f,
-						0.0f, 0.0f, 0.0f,
-						0.0f, -1.0f, 0.0f,
-						1.0f, 0.0f, 0.0f,
-						20.0f);
+		0.0f, 0.0f,
+		0.0f, -15.0f, -10.0f);
+
+	pointLights[1] = PointLight(1024, 1024,
+		0.1f, 100.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.4f,
+		2.0f, 2.0f, 0.0f,
+		0.3f, 0.01f, 0.01f);
+	pointLightCount++;
+	pointLights[0] = PointLight(1024, 1024,
+		0.1f, 100.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.4f,
+		-2.0f, 2.0f, 0.0f,
+		0.3f, 0.01f, 0.01f);
+	pointLightCount++;
+
+
+	spotLights[0] = SpotLight(1024, 1024,
+		0.1f, 100.0f,
+		1.0f, 1.0f, 1.0f,
+		0.0f, 2.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		20.0f);
 	spotLightCount++;
 	spotLights[1] = SpotLight(1024, 1024,
-		0.01f, 100.f, 
+		0.1f, 100.0f,
 		1.0f, 1.0f, 1.0f,
 		0.0f, 1.0f,
 		0.0f, -1.5f, 0.0f,
