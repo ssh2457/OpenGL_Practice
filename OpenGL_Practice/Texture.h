@@ -1,13 +1,14 @@
 #pragma once
-#include <GL/glew.h>
+
+#include <GL\glew.h>
 
 #include "stb_image.h"
 
-class Texture {
+class Texture
+{
 public:
 	Texture();
 	Texture(const char* fileLoc);
-	virtual ~Texture();
 
 	bool LoadTexture();
 	bool LoadTextureA();
@@ -15,8 +16,12 @@ public:
 	void UseTexture();
 	void ClearTexture();
 
+	~Texture();
+
 private:
 	GLuint textureID;
 	int width, height, bitDepth;
+
 	const char* fileLocation;
 };
+

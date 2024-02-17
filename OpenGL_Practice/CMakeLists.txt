@@ -3,7 +3,22 @@
 #
 
 # Add source to this project's executable.
-add_executable (OpenGL_Practice OpenGL_Practice.cpp Camera.cpp Mesh.cpp Shader.cpp Texture.cpp Window.cpp "Light.h" "Light.cpp" "Material.h" "Material.cpp" "DirectionalLight.h" "DirectionalLight.cpp" "PointLight.h" "PointLight.cpp" "Common.h" "SpotLight.h" "SpotLight.cpp" "Model.h" "Model.cpp" "ShadowMap.h" "ShadowMap.cpp")
+add_executable (OpenGL_Practice main.cpp
+"Camera.h" "Camera.cpp"
+"CommonValues.h" 
+"DirectionalLight.h" "DirectionalLight.cpp" 
+"Light.h" "Light.cpp" 
+"Material.h" "Material.cpp" 
+"Mesh.h" "Mesh.cpp"
+"Model.h" "Model.cpp" 
+"OmniShadowMap.h" "OmniShadowMap.cpp"
+"PointLight.h" "PointLight.cpp" 
+"Shader.h" "Shader.cpp"
+"ShadowMap.h" "ShadowMap.cpp"
+"SpotLight.h" "SpotLight.cpp"
+"Texture.h" "Texture.cpp"
+"Window.h" "Window.cpp" 
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET OpenGL_Practice PROPERTY CXX_STANDARD 20)

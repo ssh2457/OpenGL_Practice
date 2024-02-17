@@ -1,21 +1,9 @@
 #include "Texture.h"
 
-Texture::Texture(const char* fileLoc)
-	: textureID(0)
-	, width(0)
-	, height(0)
-	, bitDepth(0)
-	, fileLocation(fileLoc)
+
+
+Texture::Texture()
 {
-
-}
-
-Texture::~Texture() {
-	ClearTexture();
-}
-
-void Texture::ClearTexture() {
-	glDeleteTextures(1, &textureID);
 	textureID = 0;
 	width = 0;
 	height = 0;
@@ -23,10 +11,21 @@ void Texture::ClearTexture() {
 	fileLocation = "";
 }
 
-bool Texture::LoadTexture() {
-	unsigned char* texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
-	if (!texData) {
-		printf("failed to find: %s\n", fileLocation);
+Texture::Texture(const char* fileLoc)
+{
+	textureID = 0;
+	width = 0;
+	height = 0;
+	bitDepth = 0;
+	fileLocation = fileLoc;
+}
+
+bool Texture::LoadTexture()
+{
+	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
+	if (!texData)
+	{
+		printf("Failed to find: %s\n", fileLocation);
 		return false;
 	}
 
@@ -48,10 +47,12 @@ bool Texture::LoadTexture() {
 	return true;
 }
 
-bool Texture::LoadTextureA() {
-	unsigned char* texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
-	if (!texData) {
-		printf("failed to find: %s\n", fileLocation);
+bool Texture::LoadTextureA()
+{
+	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
+	if (!texData)
+	{
+		printf("Failed to find: %s\n", fileLocation);
 		return false;
 	}
 
@@ -73,7 +74,24 @@ bool Texture::LoadTextureA() {
 	return true;
 }
 
-void Texture::UseTexture() {
+void Texture::UseTexture()
+{
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureID);
+}
+
+void Texture::ClearTexture()
+{
+	glDeleteTextures(1, &textureID);
+	textureID = 0;
+	width = 0;
+	height = 0;
+	bitDepth = 0;
+	fileLocation = "";
+}
+
+
+Texture::~Texture()
+{
+	ClearTexture();
 }

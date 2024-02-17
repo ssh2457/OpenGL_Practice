@@ -1,28 +1,30 @@
 #pragma once
 
-#include <GL/glew.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <GL\glew.h>
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 
 #include "ShadowMap.h"
 
-class Light {
+class Light
+{
 public:
 	Light();
-	Light(GLfloat shadowWidth, GLfloat shadowHeight,
-		GLfloat red, GLfloat green, GLfloat blue, 
-		GLfloat ambientIntensity,GLfloat diffuseIntensity);
-	virtual ~Light();
+	Light(GLuint shadowWidth, GLuint shadowHeight, 
+			GLfloat red, GLfloat green, GLfloat blue,
+			GLfloat aIntensity, GLfloat dIntensity);
 
-	// Shadow
-	ShadowMap* GetShadowMap() const { return shadowMap; }
+	ShadowMap* getShadowMap() { return shadowMap; }
+
+	~Light();
 
 protected:
-	glm::vec3 Colour;
-	GLfloat AmbientIntensity;
-	GLfloat DiffuseIntensity;
+	glm::vec3 colour;
+	GLfloat ambientIntensity;
+	GLfloat diffuseIntensity;
 
-	// Shadow
-	ShadowMap* shadowMap;
 	glm::mat4 lightProj;
+
+	ShadowMap* shadowMap;
 };
+

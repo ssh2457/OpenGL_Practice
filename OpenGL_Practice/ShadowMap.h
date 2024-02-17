@@ -4,6 +4,7 @@
 
 #include <GL\glew.h>
 
+
 class ShadowMap
 {
 public:

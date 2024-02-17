@@ -1,23 +1,24 @@
 #pragma once
-
 #include "Light.h"
-#include <GL/glew.h>
-#include <glm/glm.hpp>
 
-
-class DirectionalLight : public Light {
+class DirectionalLight :
+	public Light
+{
 public:
 	DirectionalLight();
-	DirectionalLight(GLfloat shadowWidth, GLfloat shadowHeightm,
+	DirectionalLight(GLuint shadowWidth, GLuint shadowHeight, 
 					GLfloat red, GLfloat green, GLfloat blue,
-					GLfloat ambientIntensity, GLfloat diffuseIntensity,
-					GLfloat x, GLfloat y, GLfloat z);
-	virtual ~DirectionalLight();
+					GLfloat aIntensity, GLfloat dIntensity,
+					GLfloat xDir, GLfloat yDir, GLfloat zDir);
 
-	void UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLocation,
-		GLuint diffuseIntensityLocation, GLuint directionLocation);
+	void UseLight(GLfloat ambientIntensityLocation, GLfloat ambientColourLocation,
+		GLfloat diffuseIntensityLocation, GLfloat directionLocation);
 
-	glm::mat4 CalcLightTransform();
+	glm::mat4 CalculateLightTransform();
+
+	~DirectionalLight();
+
 private:
-	glm::vec3 Direction;
+	glm::vec3 direction;
 };
+

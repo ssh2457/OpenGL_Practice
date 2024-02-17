@@ -1,4 +1,4 @@
-﻿#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
 
 #include <stdio.h>
 #include <string.h>
@@ -12,7 +12,7 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
 
-#include "Common.h"
+#include "CommonValues.h"
 
 #include "Window.h"
 #include "Mesh.h"
@@ -23,6 +23,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
+#include "OmniShadowMap.h"
 
 #include "Model.h"
 
@@ -30,19 +31,20 @@ const float toRadians = 3.14159265f / 180.0f;
 
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 uniformSpecularIntensity = 0, uniformShininess = 0,
-uniformDirectionalLightTransform = 0;
+uniformDirectionalLightTransform = 0, uniformOmniLightPos = 0, uniformFarPlane;
 
-Window mainWindow(1366, 768); // 1280, 1024 or 1024, 768;
+Window mainWindow;
 std::vector<Mesh*> meshList;
 
 std::vector<Shader> shaderList;
 Shader directionalShadowShader;
+Shader omniShadowShader;
 
-Camera camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);;
+Camera camera;
 
-Texture brickTexture = Texture("../../Textures/brick.png");
-Texture dirtTexture = Texture("../../Textures/dirt.png");
-Texture plainTexture = Texture("../../Textures/plain.png");
+Texture brickTexture;
+Texture dirtTexture;
+Texture plainTexture;
 
 Material shinyMaterial;
 Material dullMaterial;
@@ -51,8 +53,8 @@ Model xwing;
 Model blackhawk;
 
 DirectionalLight mainLight;
-PointLight pointLights[MAX_POINT_LIGHT];
-SpotLight spotLights[MAX_SPOT_LIGHT];
+PointLight pointLights[MAX_POINT_LIGHTS];
+SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 unsigned int pointLightCount = 0;
 unsigned int spotLightCount = 0;
@@ -68,8 +70,8 @@ static const char* vShader = "../../Shaders/shader.vert";
 // Fragment Shader
 static const char* fShader = "../../Shaders/shader.frag";
 
-void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat* vertices, unsigned int verticeCount,
-	unsigned int vLength, unsigned int normalOffset)
+void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloat * vertices, unsigned int verticeCount, 
+						unsigned int vLength, unsigned int normalOffset)
 {
 	for (size_t i = 0; i < indiceCount; i += 3)
 	{
@@ -80,7 +82,7 @@ void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat
 		glm::vec3 v2(vertices[in2] - vertices[in0], vertices[in2 + 1] - vertices[in0 + 1], vertices[in2 + 2] - vertices[in0 + 2]);
 		glm::vec3 normal = glm::cross(v1, v2);
 		normal = glm::normalize(normal);
-
+		
 		in0 += normalOffset; in1 += normalOffset; in2 += normalOffset;
 		vertices[in0] += normal.x; vertices[in0 + 1] += normal.y; vertices[in0 + 2] += normal.z;
 		vertices[in1] += normal.x; vertices[in1 + 1] += normal.y; vertices[in1 + 2] += normal.z;
@@ -96,9 +98,9 @@ void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat
 	}
 }
 
-void CreateObjects()
+void CreateObjects() 
 {
-	unsigned int indices[] = {
+	unsigned int indices[] = {		
 		0, 3, 1,
 		1, 3, 2,
 		2, 3, 0,
@@ -106,11 +108,11 @@ void CreateObjects()
 	};
 
 	GLfloat vertices[] = {
-		//	x      y      z			u	  v			nx	  ny    nz
-			-1.0f, -1.0f, -0.6f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-			0.0f, -1.0f, 1.0f,		0.5f, 0.0f,		0.0f, 0.0f, 0.0f,
-			1.0f, -1.0f, -0.6f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f,		0.5f, 1.0f,		0.0f, 0.0f, 0.0f
+	//	x      y      z			u	  v			nx	  ny    nz
+		-1.0f, -1.0f, -0.6f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 1.0f,		0.5f, 0.0f,		0.0f, 0.0f, 0.0f,
+		1.0f, -1.0f, -0.6f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,		0.5f, 1.0f,		0.0f, 0.0f, 0.0f
 	};
 
 	unsigned int floorIndices[] = {
@@ -127,26 +129,27 @@ void CreateObjects()
 
 	calcAverageNormals(indices, 12, vertices, 32, 8, 5);
 
-	Mesh* obj1 = new Mesh();
+	Mesh *obj1 = new Mesh();
 	obj1->CreateMesh(vertices, indices, 32, 12);
 	meshList.push_back(obj1);
 
-	Mesh* obj2 = new Mesh();
+	Mesh *obj2 = new Mesh();
 	obj2->CreateMesh(vertices, indices, 32, 12);
 	meshList.push_back(obj2);
 
-	Mesh* obj3 = new Mesh();
+	Mesh *obj3 = new Mesh();
 	obj3->CreateMesh(floorVertices, floorIndices, 32, 6);
 	meshList.push_back(obj3);
 }
 
 void CreateShaders()
 {
-	Shader* shader1 = new Shader();
+	Shader *shader1 = new Shader();
 	shader1->CreateFromFiles(vShader, fShader);
 	shaderList.push_back(*shader1);
 
 	directionalShadowShader.CreateFromFiles("../../Shaders/directional_shadow_map.vert", "../../Shaders/directional_shadow_map.frag");
+	omniShadowShader.CreateFromFiles("../../Shaders/omni_shadow_map.vert", "../../Shaders/omni_shadow_map.geom", "../../Shaders/omni_shadow_map.frag");
 }
 
 void RenderScene()
@@ -201,13 +204,37 @@ void DirectionalShadowMapPass(DirectionalLight* light)
 {
 	directionalShadowShader.UseShader();
 
-	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
+	glViewport(0, 0, light->getShadowMap()->GetShadowWidth(), light->getShadowMap()->GetShadowHeight());
 
-	light->GetShadowMap()->Write();
+	light->getShadowMap()->Write();
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	uniformModel = directionalShadowShader.GetModelLocation();
-	directionalShadowShader.SetDirectionalLightTransform(light->CalcLightTransform());
+	auto lTransform = light->CalculateLightTransform();
+	directionalShadowShader.SetDirectionalLightTransform(&lTransform);
+
+	RenderScene();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+void OmniShadowMapPass(PointLight* light)
+{
+	omniShadowShader.UseShader();
+
+	glViewport(0, 0, light->getShadowMap()->GetShadowWidth(), light->getShadowMap()->GetShadowHeight());
+
+	light->getShadowMap()->Write();
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	uniformModel = omniShadowShader.GetModelLocation();
+	uniformOmniLightPos = omniShadowShader.GetOmniLightPosLocation();
+	uniformFarPlane = omniShadowShader.GetFarPlaneLocation();
+
+	glUniform3d(uniformOmniLightPos, light->GetPosition().x, light->GetPosition().y, light->GetPosition().z);
+	glUniform1f(uniformFarPlane, light->GetFarPlane());
+	omniShadowShader.SetLightMatrices(light->CalculateLightTransform());
 
 	RenderScene();
 
@@ -233,35 +260,40 @@ void RenderPass(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-	glUniform3f(uniformEyePosition, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
+	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
 	shaderList[0].SetDirectionalLight(&mainLight);
 	shaderList[0].SetPointLights(pointLights, pointLightCount);
 	shaderList[0].SetSpotLights(spotLights, spotLightCount);
-	shaderList[0].SetDirectionalLightTransform(mainLight.CalcLightTransform());
+	auto lTransform = mainLight.CalculateLightTransform();
+	shaderList[0].SetDirectionalLightTransform(&lTransform);
 
-	mainLight.GetShadowMap()->Read(GL_TEXTURE1);
+	mainLight.getShadowMap()->Read(GL_TEXTURE1);
 	shaderList[0].SetTexture(0);
 	shaderList[0].SetDirectionalShadowMap(1);
 
-	glm::vec3 lowerLight = camera.GetCameraPosition();
+	glm::vec3 lowerLight = camera.getCameraPosition();
 	lowerLight.y -= 0.3f;
 	//spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 
 	RenderScene();
 }
 
-int main() {
-
+int main() 
+{
+	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
 	mainWindow.Initialise();
 
 	CreateObjects();
 	CreateShaders();
 
-	//camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 5.0f, 0.5f);
 
+	brickTexture = Texture("../../Textures/brick.png");
 	brickTexture.LoadTextureA();
+	dirtTexture = Texture("../../Textures/dirt.png");
 	dirtTexture.LoadTextureA();
+	plainTexture = Texture("../../Textures/plain.png");
 	plainTexture.LoadTextureA();
 
 	shinyMaterial = Material(4.0f, 256);
@@ -274,30 +306,38 @@ int main() {
 	blackhawk.LoadModel("../../Models/uh60.obj");
 
 	mainLight = DirectionalLight(2048, 2048,
+								1.0f, 1.0f, 1.0f, 
+								0.1f, 0.3f,
+								0.0f, -15.0f, -10.0f);
+
+	pointLights[0] = PointLight(1024, 1024,
+		0.01f, 100.f,
+		0.0f, 0.0f, 1.0f,
+								0.0f, 0.1f,
+								0.0f, 0.0f, 0.0f,
+								0.3f, 0.2f, 0.1f);
+	pointLightCount++;
+	pointLights[1] = PointLight(1024, 1024,
+		0.01f, 100.f, 
+		0.0f, 1.0f, 0.0f,
+								0.0f, 0.1f,
+								-4.0f, 2.0f, 0.0f,
+								0.3f, 0.1f, 0.1f);
+	pointLightCount++;
+
+	
+	spotLights[0] = SpotLight(1024, 1024,
+		0.01f, 100.f, 
 		1.0f, 1.0f, 1.0f,
-		0.1f, 0.3f,
-		0.0f, -15.0f, -10.0f);
-
-	pointLights[0] = PointLight(0.0f, 0.0f, 1.0f,
-		0.0f, 0.1f,
-		0.0f, 0.0f, 0.0f,
-		0.3f, 0.2f, 0.1f);
-	pointLightCount++;
-	pointLights[1] = PointLight(0.0f, 1.0f, 0.0f,
-		0.0f, 0.1f,
-		-4.0f, 2.0f, 0.0f,
-		0.3f, 0.1f, 0.1f);
-	pointLightCount++;
-
-
-	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
-		0.0f, 2.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		20.0f);
+						0.0f, 2.0f,
+						0.0f, 0.0f, 0.0f,
+						0.0f, -1.0f, 0.0f,
+						1.0f, 0.0f, 0.0f,
+						20.0f);
 	spotLightCount++;
-	spotLights[1] = SpotLight(1.0f, 1.0f, 1.0f,
+	spotLights[1] = SpotLight(1024, 1024,
+		0.01f, 100.f, 
+		1.0f, 1.0f, 1.0f,
 		0.0f, 1.0f,
 		0.0f, -1.5f, 0.0f,
 		-100.0f, -1.0f, 0.0f,
@@ -307,10 +347,10 @@ int main() {
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (GLfloat)mainWindow.GetBufferWidth() / mainWindow.GetBufferHeight(), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(60.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
 	// Loop until window closed
-	while (!mainWindow.GetShouldClose())
+	while (!mainWindow.getShouldClose())
 	{
 		GLfloat now = glfwGetTime(); // SDL_GetPerformanceCounter();
 		deltaTime = now - lastTime; // (now - lastTime)*1000/SDL_GetPerformanceFrequency();
@@ -319,13 +359,21 @@ int main() {
 		// Get + Handle User Input
 		glfwPollEvents();
 
-		camera.KeyControl(mainWindow.GetKeys(), deltaTime);
-		camera.MouseControl(mainWindow.GetXChange(), mainWindow.GetYChange());
+		camera.keyControl(mainWindow.getsKeys(), deltaTime);
+		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
 		DirectionalShadowMapPass(&mainLight);
-		RenderPass(camera.CalculateViewMatrix(), projection);
+		for (size_t i = 0; i < pointLightCount; ++i) {
+			OmniShadowMapPass(&pointLights[i]);
+		}
 
-		mainWindow.SwapBuffers();
+		for (size_t i = 0; i < spotLightCount; ++i) {
+			OmniShadowMapPass(&spotLights[i]);
+		}
+
+		RenderPass(camera.calculateViewMatrix(), projection);
+
+		mainWindow.swapBuffers();
 	}
 
 	return 0;
