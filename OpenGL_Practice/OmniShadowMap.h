@@ -1,16 +1,17 @@
 #pragma once
-
 #include "ShadowMap.h"
-
-class OmniShadowMap : public ShadowMap {
+class OmniShadowMap :
+	public ShadowMap
+{
 public:
 	OmniShadowMap();
-	virtual ~OmniShadowMap();
 
-	virtual bool Init(GLuint width, GLuint height) override;
+	bool Init(unsigned int width, unsigned int height);
 
-	virtual void Write() override;
+	void Write();
 
-	virtual void Read(GLenum TextureUnit) override;
-private:
+	void Read(GLenum TextureUnit);
+
+	~OmniShadowMap();
 };
+

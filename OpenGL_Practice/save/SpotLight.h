@@ -1,13 +1,15 @@
 #pragma once
 #include "PointLight.h"
+
+#include "OmniShadowMap.h"
 class SpotLight :
 	public PointLight
 {
 public:
 	SpotLight();
 
-	SpotLight(GLfloat shadowWidth, GLfloat shadowHeight,
-		GLfloat near, GLfloat far, 
+	SpotLight(GLuint shadowWidth, GLuint shadowHeight,
+		GLfloat near, GLfloat far,
 		GLfloat red, GLfloat green, GLfloat blue,
 		GLfloat aIntensity, GLfloat dIntensity,
 		GLfloat xPos, GLfloat yPos, GLfloat zPos,
@@ -22,15 +24,11 @@ public:
 
 	void SetFlash(glm::vec3 pos, glm::vec3 dir);
 
-	void Toggle() { isOn = !isOn; }
-
 	~SpotLight();
 
 private:
 	glm::vec3 direction;
 
 	GLfloat edge, procEdge;
-
-	bool isOn;
 };
 

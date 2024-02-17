@@ -3,7 +3,8 @@
 #
 
 # Add source to this project's executable.
-add_executable (OpenGL_Practice main.cpp
+add_executable (OpenGL_Practice 
+			"main.cpp"
 "Camera.h" "Camera.cpp"
 "CommonValues.h" 
 "DirectionalLight.h" "DirectionalLight.cpp" 
